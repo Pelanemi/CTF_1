@@ -1,0 +1,23 @@
+version: '3'
+services:
+  desktop-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app
+    ports:
+      - "8080:8080"  # Ändere den Host-Port nach Bedarf
+    environment:
+      - MYSQL_HOST=host.docker.internal  # Dies ermöglicht die Verbindung zur MAMP-Datenbank
+      - MYSQL_PORT=8889  # Dein MAMP MySQL-Port
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "8889:3306"  # Mapping des MySQL-Ports
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: root
