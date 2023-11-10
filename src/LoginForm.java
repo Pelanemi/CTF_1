@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Executable;
+// import java.lang.reflect.Executable;
 import java.sql.*;
 //import java.sql.DriverManager;
 //import java.sql.PreparedStatement;
@@ -9,9 +9,11 @@ import java.sql.*;
 
 import javax.swing.*;
 
-import com.mysql.cj.xdevapi.Result;
+// import com.mysql.cj.xdevapi.Result;
 
 public class LoginForm extends JFrame {
+
+    private int loginAttempts = 0;
 
     final private Font mainFont = new Font("Segoe print", Font.BOLD, 18);
     JTextField tfEmail;
@@ -93,10 +95,16 @@ public class LoginForm extends JFrame {
                     "Try again", 
                     JOptionPane.ERROR_MESSAGE);
                 } catch (IncorrectPasswordException incorrectPasswordException) {
-                    JOptionPane.showMessageDialog(LoginForm.this, 
-                    "Password invalid. ", 
-                    "Try again", 
-                    JOptionPane.ERROR_MESSAGE);
+                    int remainingAttempts = 5 - loginAttempts; // You can set your own threshold
+                    if (remainingAttempts > 0) {
+                        JOptionPane.showMessageDialog(LoginForm.this, 
+                        "Password invalid. ", 
+                        "Try again", 
+                        JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(LoginForm.this, "Account locked due to multiple incorrect attempts. Contact admin@gmail.com.", "Account Locked", JOptionPane.ERROR_MESSAGE);
+                        }
                 }
                 catch (Exception sqlException) {
 
@@ -224,12 +232,15 @@ public class LoginForm extends JFrame {
                 
                 if (passwordCResultSet.next()) {
                     user = new User();
+                    // Reset login attempts if the correct password is provided
+                    loginAttempts = 0;
                     user.name = passwordCResultSet.getString("name");
                     user.email = passwordCResultSet.getString("email");
                     user.phone = passwordCResultSet.getString("phone");
                     user.address = passwordCResultSet.getString("address");
                     user.password = passwordCResultSet.getString("password");
                 } else {
+                    incrementLoginAttempts();
                     throw new IncorrectPasswordException("Incorrect password");
                 }
             } 
@@ -290,6 +301,10 @@ public class LoginForm extends JFrame {
         return user;
     }
     */
+
+    private void incrementLoginAttempts() {
+        loginAttempts++;
+    }
 
     public static void main(String[] args) {
         LoginForm loginForm = new LoginForm();
